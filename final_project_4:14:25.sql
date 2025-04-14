@@ -166,3 +166,10 @@ INSERT INTO diagnoses (patient_id, visit_id, dx_code) VALUES
 (7, 46, 'R53.83'), -- fatigue, ICD-10
 (16, 47, 'J00'),
 (17, 48, 'F41.1');
+
+LOAD DATA LOCAL INFILE '' /*insert path name here*/
+INTO TABLE diagnosislookup
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(dx_id, dx_code, dx_name, dx_category);
