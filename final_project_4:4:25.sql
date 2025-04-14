@@ -33,10 +33,10 @@ CREATE TABLE diagnoses (
 	PRIMARY KEY (diagnosis_id), 
     diagnosis_id MEDIUMINT UNSIGNED AUTO_INCREMENT, 
     patient_id SMALLINT UNSIGNED, 
-    visit_id SMALLINT UNSIGNED,
+    visit_id MEDIUMINT UNSIGNED,
     dx_code VARCHAR(10),
-    FOREIGN KEY (patient_id) REFERENCES identifiables(patient_id)
-    FOREIGN KEY (visit_id) REFERENCES visits(visit_id)
+    FOREIGN KEY (patient_id) REFERENCES identifiables(patient_id),
+    FOREIGN KEY (visit_id) REFERENCES visits(visit_id),
     FOREIGN KEY ( dx_code) REFERENCES diagnosislookup (dx_code)
     );
 
@@ -45,6 +45,6 @@ CREATE TABLE diagnosislookup (
     dx_id MEDIUMINT UNSIGNED AUTO_INCREMENT, 
     dx_name VARCHAR(200),
     dx_code VARCHAR(10),
-	dx_category VARCHAR(50),
+	dx_category VARCHAR(50)
   );
 
