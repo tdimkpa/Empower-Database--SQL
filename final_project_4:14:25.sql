@@ -188,3 +188,14 @@ INSERT INTO diagnoses (patient_id, visit_id, dx_code) VALUES
 (7, 46, 'R53.83'), -- fatigue, ICD-10
 (16, 47, 'J00'),
 (17, 48, 'F41.1');
+
+-- Question 1: View + join
+CREATE VIEW procedure_count AS
+	SELECT d.dx_name, COUNT(p.patient_id) AS procedure_cnt
+	FROM diagnosislookup AS d
+	INNER JOIN diagnoses AS p 
+	USING (dx_code)
+	GROUP BY d.dx_name
+	ORDER BY procedure_cnt DESC;
+#This view is meant to show the number of patients who underwent each procedure, ordered from highest to lowest
+#This should be stored as a view so it can be updated if we add more data to the visits table
