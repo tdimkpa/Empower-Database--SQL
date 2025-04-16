@@ -1,19 +1,19 @@
-dx_id,dx_code,dx_name,dx_category
-1,F33.1,Major Depressive Disorder,Psychiatric
-2,F41.1,Generalized Anxiety Disorder,Psychiatric
-3,I10,Hypertension,Primary Care
-4,E11.9,Type 2 Diabetes Mellitus,Primary Care
-5,J45.909,Unspecified Asthma,Primary Care
-6,F43.10,Post-Traumatic Stress Disorder,Psychiatric
-7,F31.9,"Bipolar Disorder, Unspecified",Psychiatric
-8,E66.9,"Obesity, Unspecified",Primary Care
-9,G47.00,"Insomnia, Unspecified",Psychiatric
-10,G43.909,"Migraine, Unspecified",Primary Care
-11,E78.5,"Hyperlipidemia, Unspecified",Primary Care
-12,M79.67,Pain in Foot and Toes,Primary Care
-13,F40.00,"Agoraphobia, Unspecified",Psychiatric
-14,J00,Acute Nasopharyngitis (Common Cold),Primary Care
-15,G47.33,Obstructive Sleep Apnea,Primary Care
-16,J30.9,"Allergic Rhinitis, Unspecified",Primary Care
-17,F33.2,"Major Depressive Episode, Severe",Psychiatric
-18,R53.83,Other Fatigue,Primary Care
+dx_code,dx_name,dx_category
+F33.1,Major Depressive Disorder,Psychiatric
+F41.1,Generalized Anxiety Disorder,Psychiatric
+I10,Hypertension,Primary Care
+E11.9,Type 2 Diabetes Mellitus,Primary Care
+J45.909,Unspecified Asthma,Primary Care
+F43.10,Post-Traumatic Stress Disorder,Psychiatric
+F31.9,Bipolar Disorder Unspecified,Psychiatric
+E66.9,Obesity Unspecified,Primary Care
+G47.00,Insomnia Unspecified,Psychiatric
+G43.909,Migraine Unspecified,Primary Care
+E78.5,Hyperlipidemia Unspecified,Primary Care
+M79.67,Pain in Foot and Toes,Primary Care
+F40.00,Agoraphobia Unspecified,Psychiatric
+J00,Acute Nasopharyngitis (Common Cold),Primary Care
+G47.33,Obstructive Sleep Apnea,Primary Care
+J30.9,Allergic Rhinitis  Unspecified,Primary Care
+F33.2,Major Depressive Episode Severe,Psychiatric
+R53.83,Other Fatigue,Primary Care
