@@ -212,3 +212,16 @@ FROM diagnosis_per_patient dpp
     USING (patient_id) 
 WHERE unique_diagnoses > 2;
 #This tells us how many diagnoses per patient
+
+-- Question 5: Self-Join
+#Patients Who Have Visited on the Same Day as Another Patient: Name and Visit Type
+SELECT i.first_name AS patient_a, i2.first_name AS patient_b, v.visit_type AS vtype_a, b.visit_type AS vtype_b, 
+					v.visit_date
+FROM visits as v
+	INNER JOIN visits AS b
+    USING (visit_date)
+    INNER JOIN identifiables AS i
+    ON v.patient_id = i.patient_id
+	INNER JOIN identifiables AS i2
+    ON b.patient_id = i2.patient_id
+WHERE v.patient_id <  b.patient_id
