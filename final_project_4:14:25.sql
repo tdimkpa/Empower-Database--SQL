@@ -224,4 +224,15 @@ FROM visits as v
     ON v.patient_id = i.patient_id
 	INNER JOIN identifiables AS i2
     ON b.patient_id = i2.patient_id
-WHERE v.patient_id <  b.patient_id
+WHERE v.patient_id <  b.patient_id;
+
+-- Question 7: Union    
+SELECT primary_complaint AS complaint
+FROM visits
+
+UNION
+
+SELECT other_complaint
+FROM visits
+WHERE other_complaint IS NOT NULL;
+#This gives a full list of unique complaints reported in the visits table.
