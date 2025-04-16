@@ -236,3 +236,19 @@ SELECT other_complaint
 FROM visits
 WHERE other_complaint IS NOT NULL;
 #This gives a full list of unique complaints reported in the visits table.
+
+#Dense ranked to account for ties. Question aim is to rank the diagnoses per visit type and see the top 2 for each category
+WITH ranked_diagnoses AS (
+    SELECT v.visit_type, dl.dx_name, COUNT(d.diagnosis_id) AS diagnosis_count,
+        DENSE_RANK() OVER (PARTITION BY v.visit_type ORDER BY COUNT(d.diagnosis_id) DESC) AS rank_type
+    FROM diagnoses d
+		INNER JOIN visits v 
+        ON d.visit_id = v.visit_id
+		INNER JOIN diagnosislookup dl 
+        ON d.dx_code = dl.dx_code
+    GROUP BY v.visit_type, dl.dx_name
+)
+SELECT visit_type, dx_name, diagnosis_count, rank_type
+FROM ranked_diagnoses
+WHERE rank_type <= 2
+ORDER BY visit_type, rank_type;
