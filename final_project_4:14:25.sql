@@ -1,6 +1,6 @@
 CREATE SCHEMA empower;
 USE empower;
-
+--DROP SCHEMA empower 
 --
 -- Table structure for table `identifiables`
 --
@@ -29,16 +29,9 @@ CREATE TABLE visits (
 	FOREIGN KEY (patient_id) REFERENCES identifiables(patient_id)
 );
 
-CREATE TABLE diagnoses (
-	PRIMARY KEY (diagnosis_id), 
-    diagnosis_id MEDIUMINT UNSIGNED AUTO_INCREMENT, 
-    patient_id SMALLINT UNSIGNED, 
-    visit_id MEDIUMINT UNSIGNED,
-    dx_code VARCHAR(10),
-    FOREIGN KEY (patient_id) REFERENCES identifiables(patient_id),
-    FOREIGN KEY (visit_id) REFERENCES visits(visit_id),
-    FOREIGN KEY ( dx_code) REFERENCES diagnosislookup (dx_code)
-    );
+--
+-- Table structure for table `diagnosislookup`
+--
 
 CREATE TABLE diagnosislookup (
 	PRIMARY KEY (dx_id), 
@@ -47,6 +40,24 @@ CREATE TABLE diagnosislookup (
     dx_code VARCHAR(10),
 	dx_category VARCHAR(50)
   );
+  
+  CREATE UNIQUE INDEX idx_dx_code 
+  ON diagnosislookup (dx_code);
+
+--
+-- Table structure for table `diagnoses`
+-- 
+
+CREATE TABLE diagnoses (
+	PRIMARY KEY (diagnosis_id), 
+    diagnosis_id MEDIUMINT UNSIGNED AUTO_INCREMENT, 
+    patient_id SMALLINT UNSIGNED, 
+    visit_id MEDIUMINT UNSIGNED,
+    dx_code VARCHAR(10),
+    FOREIGN KEY (patient_id) REFERENCES identifiables(patient_id),
+    FOREIGN KEY (visit_id) REFERENCES visits(visit_id),
+    FOREIGN KEY (dx_code) REFERENCES diagnosislookup (dx_code)
+    );
 
 INSERT INTO identifiables (first_name, last_name, patient_dob, gender) VALUES
 ('John', 'Doe', '1980-01-15', 'M'),
@@ -63,8 +74,8 @@ INSERT INTO identifiables (first_name, last_name, patient_dob, gender) VALUES
 ('Grace', 'Kim', '1979-10-10', 'F'),
 ('Aiden', 'Clark', '1983-05-19', 'M'),
 ('Maya', 'Patel', '1994-06-06', 'F'),
-('Noah', 'Nguyen', '1986-09-09', 'M')
-('Lisa', 'Pardee', '2001-09-16', 'F')
+('Noah', 'Nguyen', '1986-09-09', 'M'),
+('Lisa', 'Pardee', '2001-09-16', 'F'),
 ('Tobechi', 'Dimkpa', '2002-07-05', 'F');
 
 INSERT INTO visits (patient_id, visit_type, visit_date, primary_complaint, other_complaint) VALUES
@@ -117,6 +128,17 @@ INSERT INTO visits (patient_id, visit_type, visit_date, primary_complaint, other
 (16, 'Primary care', '2024-03-18', 'Cough', NULL),
 (17, 'Psychiatric', '2024-04-22', 'Excessive worry', NULL);
 
+SHOW GLOBAL VARIABLES LIKE 'local_infile';
+SET GLOBAL local_infile = true;
+
+LOAD DATA LOCAL INFILE '/Users/tobechidimkpa/Downloads/diagnosislookup_final.csv' /*insert path name here*/
+INTO TABLE diagnosislookup
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(dx_code, dx_name, dx_category);
+
+
 INSERT INTO diagnoses (patient_id, visit_id, dx_code) VALUES
 (6, 1, 'I10'),
 (1, 2, 'I10'),
@@ -166,10 +188,3 @@ INSERT INTO diagnoses (patient_id, visit_id, dx_code) VALUES
 (7, 46, 'R53.83'), -- fatigue, ICD-10
 (16, 47, 'J00'),
 (17, 48, 'F41.1');
-
-LOAD DATA LOCAL INFILE '' /*insert path name here*/
-INTO TABLE diagnosislookup
-FIELDS TERMINATED BY ','
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS
-(dx_id, dx_code, dx_name, dx_category);
