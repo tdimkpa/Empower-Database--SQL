@@ -198,4 +198,17 @@ CREATE VIEW procedure_count AS
 	GROUP BY d.dx_name
 	ORDER BY procedure_cnt DESC;
 #This view is meant to show the number of patients who underwent each procedure, ordered from highest to lowest
-#This should be stored as a view so it can be updated if we add more data to the visits table
+#This should be stored as a view so it can be updated if we add more data to the tables
+
+-- Question 3: CTE 
+WITH diagnosis_per_patient AS (
+    SELECT patient_id, COUNT(DISTINCT dx_code) AS unique_diagnoses
+    FROM diagnoses
+    GROUP BY patient_id
+)
+SELECT i.first_name, i.last_name, dpp.unique_diagnoses
+FROM diagnosis_per_patient dpp
+	INNER JOIN identifiables i 
+    USING (patient_id) 
+WHERE unique_diagnoses > 2;
+#This tells us how many diagnoses per patient
