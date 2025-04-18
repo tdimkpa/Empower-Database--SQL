@@ -54,7 +54,6 @@ CREATE TABLE diagnoses (
     patient_id SMALLINT UNSIGNED, 
     visit_id MEDIUMINT UNSIGNED,
     dx_code VARCHAR(10),
-    FOREIGN KEY (patient_id) REFERENCES identifiables(patient_id),
     FOREIGN KEY (visit_id) REFERENCES visits(visit_id),
     FOREIGN KEY (dx_code) REFERENCES diagnosislookup (dx_code)
     );
