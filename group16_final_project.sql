@@ -199,7 +199,7 @@ CREATE VIEW procedure_count AS
 #This view is meant to show the number of patients who underwent each procedure, ordered from highest to lowest
 #This should be stored as a view so it can be updated if we add more data to the tables
 
---Question 2: Temporary table that incorporates at least one join and then queries it (must be different from view)
+-- Question 2: Temporary table that incorporates at least one join and then queries it (must be different from view)
 CREATE TEMPORARY TABLE dx_gender AS 
 (
 	SELECT id.gender , vi.visit_type , vi.primary_complaint
@@ -228,12 +228,24 @@ FROM diagnosis_per_patient dpp
 WHERE unique_diagnoses > 2;
 #This tells us how many diagnoses per patient
 
---Question 4: Pivoting 
+-- Question 4: Pivoting 
 SELECT patient_id, 
-    MAX(CASE WHEN visit_type = 'Psychiatric' THEN primary_complaint END) AS  psych_complaint, 
-    MAX(CASE WHEN visit_type = 'Primary Care' THEN primary_complaint END) AS pcp_complaint 
+    GROUP_CONCAT(CASE WHEN visit_type = 'Psychiatric' THEN primary_complaint END) AS psych_complaint,
+    GROUP_CONCAT(CASE WHEN visit_type = 'Primary care' THEN primary_complaint END) AS pcp_complaint
 FROM visits 
-GROUP BY patient_id; 
+GROUP BY patient_id;
+
+SELECT patient_id, 
+    MAX(CASE WHEN visit_type = 'Psychiatric' AND row_num = 1 THEN primary_complaint END) AS psych_complaint_1,
+    MAX(CASE WHEN visit_type = 'Psychiatric' AND row_num = 2 THEN primary_complaint END) AS psych_complaint_2,
+    MAX(CASE WHEN visit_type = 'Primary care' AND row_num = 1 THEN primary_complaint END) AS pcp_complaint_1,
+    MAX(CASE WHEN visit_type = 'Primary care' AND row_num = 2 THEN primary_complaint END) AS pcp_complaint_2
+FROM (
+    SELECT patient_id, visit_type, primary_complaint,
+           ROW_NUMBER() OVER (PARTITION BY patient_id, visit_type ORDER BY visit_date) AS row_num
+    FROM visits
+) AS subquery
+GROUP BY patient_id;
 
 # Pivoting Table from Long to Wide to Show Psych and PCP Complaints per Patient
 	
@@ -281,7 +293,7 @@ FROM visits
 WHERE other_complaint IS NOT NULL;
 #This gives a full list of unique complaints reported in the visits table.
 
---Question 8: Adds an aggregated value with OVER or PARTITION
+-- Question 8: Adds an aggregated value with OVER or PARTITION
 WITH diagnosis_counts AS (
     SELECT v.visit_type, d.patient_id, COUNT(d.diagnosis_id) AS diagnosis_count
     FROM diagnoses d
@@ -301,7 +313,7 @@ ORDER BY dc.visit_type, dc.patient_id;
 
 #Comparing each patient's diagnosis count with the average diagnosis count for their visit type (Psychiatric or Primary Care).
 	
---Question 9 
+-- Question 9 
 
 #Dense ranked to account for ties. Question aim is to rank the diagnoses per visit type and see the top 2 for each category
 WITH ranked_diagnoses AS (
