@@ -281,7 +281,7 @@ FROM visits
 WHERE other_complaint IS NOT NULL;
 #This gives a full list of unique complaints reported in the visits table.
 
---Question 8: 
+--Question 8: Adds an aggregated value with OVER or PARTITION
 WITH diagnosis_counts AS (
     SELECT v.visit_type, d.patient_id, COUNT(d.diagnosis_id) AS diagnosis_count
     FROM diagnoses d
