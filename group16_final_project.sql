@@ -199,6 +199,22 @@ CREATE VIEW procedure_count AS
 #This view is meant to show the number of patients who underwent each procedure, ordered from highest to lowest
 #This should be stored as a view so it can be updated if we add more data to the tables
 
+--Question 2: Temporary table that incorporates at least one join and then queries it (must be different from view)
+CREATE TEMPORARY TABLE dx_gender AS 
+(
+	SELECT id.gender , vi.visit_type , vi.primary_complaint
+    	FROM identifiables AS id 
+	INNER JOIN visits AS vi
+	USING (patient_id)
+); 
+
+SELECT gender, visit_type , COUNT(*) AS count_visits
+FROM dx_gender
+GROUP BY gender, visit_type
+ORDER BY count_visits ,visit_type
+
+#Temporary table shows the number of primary and psych visits by gender 
+	
 -- Question 3: CTE 
 WITH diagnosis_per_patient AS (
     SELECT patient_id, COUNT(DISTINCT dx_code) AS unique_diagnoses
@@ -212,6 +228,15 @@ FROM diagnosis_per_patient dpp
 WHERE unique_diagnoses > 2;
 #This tells us how many diagnoses per patient
 
+--Question 4: Pivoting 
+SELECT patient_id, 
+    MAX(CASE WHEN visit_type = 'Psychiatric' THEN primary_complaint END) AS  psych_complaint, 
+    MAX(CASE WHEN visit_type = 'Primary Care' THEN primary_complaint END) AS pcp_complaint 
+FROM visits 
+GROUP BY patient_id; 
+
+# Pivoting Table from Long to Wide to Show Psych and PCP Complaints per Patient
+	
 -- Question 5: Self-Join
 #Patients Who Have Visited on the Same Day as Another Patient: Name and Visit Type
 SELECT i.first_name AS patient_a, i2.first_name AS patient_b, v.visit_type AS vtype_a, b.visit_type AS vtype_b, 
@@ -225,6 +250,26 @@ FROM visits as v
     ON b.patient_id = i2.patient_id
 WHERE v.patient_id <  b.patient_id;
 
+-- Question 6: Subquery (accounts for ties)
+
+SELECT first_name, last_name
+FROM (
+    SELECT id.first_name, id.last_name, 
+    RANK() OVER(ORDER BY COUNT(*) DESC) AS rnk
+    FROM diagnoses d
+    INNER JOIN identifiables id on id.patient_id = d.patient_id
+    WHERE d.dx_code IN (
+		SELECT dx_code
+        	FROM diagnosislookup
+        	WHERE dx_name LIKE '%sleep apnea%'
+		OR dx_category LIKE '%sleep apnea%'
+)
+GROUP BY d.patient_id
+) AS ranked 
+WHERE rnk = 1; 
+
+# This query shows the patient with the highest number of diagnoses for sleep apnea 
+
 -- Question 7: Union    
 SELECT primary_complaint AS complaint
 FROM visits
@@ -235,6 +280,28 @@ SELECT other_complaint
 FROM visits
 WHERE other_complaint IS NOT NULL;
 #This gives a full list of unique complaints reported in the visits table.
+
+--Question 8: 
+WITH diagnosis_counts AS (
+    SELECT v.visit_type, d.patient_id, COUNT(d.diagnosis_id) AS diagnosis_count
+    FROM diagnoses d
+    INNER JOIN visits v 
+    ON d.visit_id = v.visit_id
+ GROUP BY v.visit_type, d.patient_id
+)
+
+SELECT dc.visit_type, dc.patient_id, dc.diagnosis_count,AVG(dc.diagnosis_count) OVER (PARTITION BY dc.visit_type) AS avg_diagnosis_count,
+    CASE 
+	WHEN dc.diagnosis_count > AVG(dc.diagnosis_count) OVER (PARTITION BY dc.visit_type) THEN 'Above Average'
+        WHEN dc.diagnosis_count < AVG(dc.diagnosis_count) OVER (PARTITION BY dc.visit_type) THEN 'Below Average'
+        ELSE 'Average'
+    END AS comparison_to_average
+FROM diagnosis_counts dc
+ORDER BY dc.visit_type, dc.patient_id;
+
+#Comparing each patient's diagnosis count with the average diagnosis count for their visit type (Psychiatric or Primary Care).
+	
+--Question 9 
 
 #Dense ranked to account for ties. Question aim is to rank the diagnoses per visit type and see the top 2 for each category
 WITH ranked_diagnoses AS (
@@ -251,3 +318,30 @@ SELECT visit_type, dx_name, diagnosis_count, rank_type
 FROM ranked_diagnoses
 WHERE rank_type <= 2
 ORDER BY visit_type, rank_type;
+
+-- Question 10: Question of our choice 
+	
+WITH patient_ages AS (
+    SELECT i.patient_id,TIMESTAMPDIFF(YEAR, i.patient_dob, CURDATE()) AS age
+    FROM identifiables AS i
+),
+age_grouped_visits AS (
+    SELECT 
+        CASE 
+	    WHEN pa.age < 18 THEN 'Under 18'
+            WHEN pa.age BETWEEN 18 AND 29 THEN '18-29'
+            WHEN pa.age BETWEEN 30 AND 44 THEN '30-44'
+            WHEN pa.age BETWEEN 45 AND 64 THEN '45-64'
+            ELSE '65+'
+        END AS age_group, v.visit_type
+    FROM patient_ages AS pa
+    INNER JOIN visits AS v 
+    USING (patient_id)
+)
+SELECT age_group,visit_type,COUNT(*) AS visit_count
+FROM age_grouped_visits
+GROUP BY age_group, visit_type
+ORDER BY FIELD(age_group, 'Under 18', '18-29', '30-44', '45-64', '65+'),visit_type;
+
+# This query displays the age group and visit count per age group for both psychiatric and primary care visits 
+
