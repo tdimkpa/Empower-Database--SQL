@@ -1,6 +1,6 @@
 CREATE SCHEMA empower;
 USE empower;
---DROP SCHEMA empower 
+
 --
 -- Table structure for table `identifiables`
 --
@@ -211,7 +211,7 @@ CREATE TEMPORARY TABLE dx_gender AS
 SELECT gender, visit_type , COUNT(*) AS count_visits
 FROM dx_gender
 GROUP BY gender, visit_type
-ORDER BY count_visits ,visit_type
+ORDER BY count_visits ,visit_type;
 
 #Temporary table shows the number of primary and psych visits by gender 
 	
@@ -234,7 +234,6 @@ SELECT patient_id,
     GROUP_CONCAT(CASE WHEN visit_type = 'Primary care' THEN primary_complaint END) AS pcp_complaint
 FROM visits 
 GROUP BY patient_id;
-
 SELECT patient_id, 
     MAX(CASE WHEN visit_type = 'Psychiatric' AND row_num = 1 THEN primary_complaint END) AS psych_complaint_1,
     MAX(CASE WHEN visit_type = 'Psychiatric' AND row_num = 2 THEN primary_complaint END) AS psych_complaint_2,
@@ -353,7 +352,13 @@ age_grouped_visits AS (
 SELECT age_group,visit_type,COUNT(*) AS visit_count
 FROM age_grouped_visits
 GROUP BY age_group, visit_type
-ORDER BY FIELD(age_group, 'Under 18', '18-29', '30-44', '45-64', '65+'),visit_type;
+ORDER BY FIELD(age_group, 'Under 18', '18-29', '30-44', '45-64', '65+'), visit_type;
 
 # This query displays the age group and visit count per age group for both psychiatric and primary care visits 
-
+/*'18-29','Psychiatric','3'
+'18-29','Primary care','3'
+'30-44','Psychiatric','17'
+'30-44','Primary care','15'
+'45-64','Psychiatric','5'
+'45-64','Primary care','5'
+*/
