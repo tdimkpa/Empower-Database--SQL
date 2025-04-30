@@ -231,11 +231,6 @@ WHERE unique_diagnoses > 2;
 
 -- Question 4: Pivoting 
 SELECT patient_id, 
-    GROUP_CONCAT(CASE WHEN visit_type = 'Psychiatric' THEN primary_complaint END) AS psych_complaint,
-    GROUP_CONCAT(CASE WHEN visit_type = 'Primary care' THEN primary_complaint END) AS pcp_complaint
-FROM visits 
-GROUP BY patient_id;
-SELECT patient_id, 
     MAX(CASE WHEN visit_type = 'Psychiatric' AND row_num = 1 THEN primary_complaint END) AS psych_complaint_1,
     MAX(CASE WHEN visit_type = 'Psychiatric' AND row_num = 2 THEN primary_complaint END) AS psych_complaint_2,
     MAX(CASE WHEN visit_type = 'Primary care' AND row_num = 1 THEN primary_complaint END) AS pcp_complaint_1,
@@ -319,7 +314,7 @@ ORDER BY dc.visit_type, dc.patient_id;
 	
 -- Question 9 
 
-#This query aims to rank the diagnoses per visit type and see the top 2 for each category. For this query, we used dense ranked to account for ties. 
+#This query aims to rank the diagnoses per visit type and see the top 2 for each category. For this query, we dense ranked to account for ties. 
 	
 WITH ranked_diagnoses AS (
     SELECT v.visit_type, dl.dx_name, COUNT(d.diagnosis_id) AS diagnosis_count,
