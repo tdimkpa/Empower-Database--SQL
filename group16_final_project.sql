@@ -196,8 +196,8 @@ CREATE VIEW procedure_count AS
 	USING (dx_code)
 	GROUP BY d.dx_name
 	ORDER BY procedure_cnt DESC;
-#This view is meant to show the number of patients who underwent each procedure, ordered from highest to lowest
-#This should be stored as a view so it can be updated if we add more data to the tables
+#This view is meant to show the number of patients who underwent each procedure, ordered from highest to lowest.
+#This should be stored as a view so it can be updated if we add more data to the tables.
 
 -- Question 2: Temporary table that incorporates at least one join and then queries it (must be different from view)
 CREATE TEMPORARY TABLE dx_gender AS 
@@ -213,7 +213,7 @@ FROM dx_gender
 GROUP BY gender, visit_type
 ORDER BY count_visits ,visit_type;
 
-#Temporary table shows the number of primary and psych visits by gender 
+#This temporary table displays the number of primary and psych visits by gender to view differences in the patient population.  
 	
 -- Question 3: CTE 
 WITH diagnosis_per_patient AS (
@@ -226,7 +226,8 @@ FROM diagnosis_per_patient dpp
 	INNER JOIN identifiables i 
     USING (patient_id) 
 WHERE unique_diagnoses > 2;
-#This tells us how many diagnoses per patient
+
+#This CTE tells us how many diagnoses there are per patient. 
 
 -- Question 4: Pivoting 
 SELECT patient_id, 
@@ -246,10 +247,12 @@ FROM (
 ) AS subquery
 GROUP BY patient_id;
 
-# Pivoting Table from Long to Wide to Show Psych and PCP Complaints per Patient
+# This pivots the table from long to wide to display psychiatric and primary care complaints per patient. 
+#We can compare complaints for psychiatric and primary care for each patient (i.e, within patient characteristics to view differences in complaints at each visit). 
 	
--- Question 5: Self-Join
-#Patients Who Have Visited on the Same Day as Another Patient: Name and Visit Type
+-- Question 5: Self-Join 
+#This query displays patients who have visited on the same day as another patient: Name and Visit Type
+	
 SELECT i.first_name AS patient_a, i2.first_name AS patient_b, v.visit_type AS vtype_a, b.visit_type AS vtype_b, 
 					v.visit_date
 FROM visits as v
@@ -279,7 +282,7 @@ GROUP BY d.patient_id
 ) AS ranked 
 WHERE rnk = 1; 
 
-# This query shows the patient with the highest number of diagnoses for sleep apnea 
+# This query shows the patient with the highest number of diagnoses for sleep apnea.  
 
 -- Question 7: Union    
 SELECT primary_complaint AS complaint
@@ -290,7 +293,8 @@ UNION
 SELECT other_complaint
 FROM visits
 WHERE other_complaint IS NOT NULL;
-#This gives a full list of unique complaints reported in the visits table.
+
+#This gives a full list of unique complaints reported in the visits table. We use the UNION operator since we do not want duplicate rows for a table displaying unique complaints.  
 
 -- Question 8: Adds an aggregated value with OVER or PARTITION
 WITH diagnosis_counts AS (
@@ -310,11 +314,13 @@ SELECT dc.visit_type, dc.patient_id, dc.diagnosis_count,AVG(dc.diagnosis_count) 
 FROM diagnosis_counts dc
 ORDER BY dc.visit_type, dc.patient_id;
 
-#Comparing each patient's diagnosis count with the average diagnosis count for their visit type (Psychiatric or Primary Care).
+#This query compares each patient diagnosis count with the average diagnosis count for their visit type (Psychiatric or Primary Care). 
+#We used OVER(PARTITION BY) to calculate separate averages for each visit type to compare patients to others within the same category.  
 	
 -- Question 9 
 
-#Dense ranked to account for ties. Question aim is to rank the diagnoses per visit type and see the top 2 for each category
+#This query aims to rank the diagnoses per visit type and see the top 2 for each category. For this query, we used dense ranked to account for ties. 
+	
 WITH ranked_diagnoses AS (
     SELECT v.visit_type, dl.dx_name, COUNT(d.diagnosis_id) AS diagnosis_count,
         DENSE_RANK() OVER (PARTITION BY v.visit_type ORDER BY COUNT(d.diagnosis_id) DESC) AS rank_type
@@ -355,10 +361,10 @@ GROUP BY age_group, visit_type
 ORDER BY FIELD(age_group, 'Under 18', '18-29', '30-44', '45-64', '65+'), visit_type;
 
 # This query displays the age group and visit count per age group for both psychiatric and primary care visits 
-/*'18-29','Psychiatric','3'
-'18-29','Primary care','3'
-'30-44','Psychiatric','17'
-'30-44','Primary care','15'
-'45-64','Psychiatric','5'
-'45-64','Primary care','5'
-*/
+#/*'18-29','Psychiatric','3'
+#'18-29','Primary care','3'
+#'30-44','Psychiatric','17'
+#'30-44','Primary care','15'
+#'45-64','Psychiatric','5'
+#'45-64','Primary care','5' #/
+
