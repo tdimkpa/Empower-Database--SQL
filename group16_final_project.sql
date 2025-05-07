@@ -74,8 +74,8 @@ INSERT INTO identifiables (first_name, last_name, patient_dob, gender) VALUES
 ('Aiden', 'Clark', '1983-05-19', 'M'),
 ('Maya', 'Patel', '1994-06-06', 'F'),
 ('Noah', 'Nguyen', '1986-09-09', 'M'),
-('Lisa', 'Pardee', '2001-09-16', 'F'),
-('Tobechi', 'Dimkpa', '2002-07-05', 'F');
+('Lisa', 'Pardee', '1999-01-01', 'F'),
+('Tobechi', 'Dimkpa', '1999-01-01', 'F');
 
 INSERT INTO visits (patient_id, visit_type, visit_date, primary_complaint, other_complaint) VALUES
 (6, 'Primary care', '2024-03-07', 'Chest pain', NULL),
